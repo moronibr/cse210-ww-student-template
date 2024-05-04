@@ -1,79 +1,135 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
-class Program
+
+public class Program
 {
-    static string answer;  
-    static string randomString;  
-    static void Main(string[] args)
-    {   
-        int menu = 0;
-       
 
-        while (menu != 5 )  
+    public static void Main(string[] args)
+    {
+    
+        List<(string question, string answer)> answersList = new List<(string, string)>();
+
+        string answer = " ";
+        while (answer != "5")
         {
-
-            
-
-            Console.WriteLine("Please select one of the following choices:");
-            Console.WriteLine("1. Write");
-            Console.WriteLine("2. Display");
-            Console.WriteLine("3. Save");
-            Console.WriteLine("4. Load");
-            Console.WriteLine("5. Quit");
-
+            Console.WriteLine("Please select one of the following choices: \n");
+            Console.WriteLine("1. Write \n2. Display \n3. Load \n4. Save \n5. Quit");
             Console.Write("What would you like to do? ");
-
-            menu = int.Parse(Console.ReadLine());
-
-            switch(menu)
-            {
-                case 1:
-                    Write();
-                    break;
-                case 2:
-                    Display();
-                    break;
-                case 3:
-                    Console.WriteLine("You chose 3");
-                    break;
-                case 4:
-                    Console.WriteLine("You chose 4");
-                    break;
-                case 5:
-                    Console.WriteLine("Quiting...");
-                    break;
-
-            }
-        }    
-
-        static void Write()
-        {
-            string [] questions = {
-                "Who was the most interesting person I interacted with today?",
-                "What was the best part of my day?",
-                "How did I see the hand of the Lord in my life today?",
-                "What was the strongest emotion I felt today?",
-                "If I had one thing I could do over today, what would it be?",
-            };
-
-            Random random = new Random();
-            int index = random.Next(0, questions.Length);
-            randomString = questions[index]; 
-
-            Console.WriteLine(randomString);
-            
             answer = Console.ReadLine();
 
+              switch (answer)
+            {
+                case "1":
+                    Write(answersList);
+                    break;
+
+                case "2":
+                    Display(answersList);
+                    break;
+
+                case "3":
+                    Load(answersList);
+                    break;
+
+                case "4":
+                    Save(answersList);
+                    break;
+
+                case "5":
+                    Console.WriteLine("Quitting...");
+                    Console.WriteLine("Goodbye!");
+                    break;
+
+                default:
+                    Console.WriteLine("Invalid option. Please try again.");
+                    break;
+            }
         }
 
-        static void Display()
-        {
-            DateTime theCurrentTime = DateTime.Now;
-            string dateText = theCurrentTime.ToShortDateString();
-            
-            Console.WriteLine($"{dateText} {randomString} {answer}");
+    }
 
-           
+    static void Write(List<(string question, string answer)> answersList)
+    {
+        
+
+        List<string> questions = new List<string>();
+        questions.Add("If I had one thing I could have done today, what would it be?");
+        questions.Add("What kind of skill would I like to have?");
+        questions.Add("What am I anxious about today?");
+        questions.Add("What can I do to feel closer from The Lord?");
+        questions.Add("What kind of spiritual work do I have to do to have more spiritual experiences?");
+
+        Random rand = new Random();
+        int index = rand.Next(0, questions.Count);
+        string question = questions[index];
+        Console.WriteLine(question);
+        Console.Write("> ");
+        string answer = Console.ReadLine();
+        Console.WriteLine("You answered: " + answer);
+
+        answersList.Add((question, answer));
+
+      
+    }
+
+    static void Display(List<(string question, string answer)> answersList)
+    {
+        DateTime theCurrentTime = DateTime.Now;
+        string dateText = theCurrentTime.ToShortDateString();
+
+        foreach (var tuple in answersList)
+        {
+            Console.WriteLine($"Date: {dateText} Question: {tuple.question}");
+            Console.WriteLine($"Answer: {tuple.answer}");
+            Console.WriteLine();
         }
     }
+    
+    static void Load(List<(string question, string answer)> answersList)
+    {
+        Console.WriteLine("What is the filename?");
+        string filename = Console.ReadLine();
+
+        Console.WriteLine("Loading from file...");
+
+        using (StreamReader inputFile = new StreamReader(filename))
+        {
+            string line;
+
+            while ((line = inputFile.ReadLine()) != null)
+            {
+                Console.WriteLine(line);
+            }
+
+        }
+    }
+
+    static void Save(List<(string question, string answer)> answersList)
+    {
+        DateTime theCurrentTime = DateTime.Now;
+        string dateText = theCurrentTime.ToShortDateString();
+
+        Console.WriteLine("What is the file name?");
+        string filename = Console.ReadLine();
+
+        using (StreamWriter outputFile = new StreamWriter(filename))
+        {   
+
+            Console.WriteLine("Saving to file...");
+
+            foreach (var tuple in answersList)
+            {
+                outputFile.WriteLine($"Date: {dateText} Question: {tuple.question}");
+                outputFile.WriteLine($"Answer: {tuple.answer}");
+                outputFile.WriteLine();
+            }
+
+            Console.WriteLine("Done!");
+        }
+
+    }
 }
+
+ 
