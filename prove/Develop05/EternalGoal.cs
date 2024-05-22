@@ -2,7 +2,7 @@ using System;
 
 public class EternalGoal : Goal
 {
-    public EternalGoal(string shortName, string description, string points) : base(shortName, description, points)
+    public EternalGoal(string name, string description, string points) : base(name, description, points)
     {
     }
 }
