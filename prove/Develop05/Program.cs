@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 
 
-    
+namespace prove    
+{
     class Program
         
     {
@@ -16,3 +17,5 @@ using System.Collections.Generic;
         }
     }
 
+
+}
