@@ -27,8 +27,8 @@ namespace prove
         
             while (menu != 6)
                 {   
-                    Console.WriteLine($"You have {_score} points");
-
+                    
+                  
                     Console.WriteLine("Menu Options: ");
                     Console.WriteLine("  1. Create New Goal");
                     Console.WriteLine("  2. List Goals");
@@ -235,7 +235,7 @@ namespace prove
 
                 if (lines.Length > 0)
                 {
-                    int.TryParse(lines[0], out _score); // Update score from file
+                    int.TryParse(lines[0], out _score); 
 
                     for (int i = 1; i < lines.Length; i++)
                     {
@@ -282,27 +282,25 @@ namespace prove
             if (goalIndex >= 0 && goalIndex < _goals.Count)
             {
                 Goal accomplishedGoal = _goals[goalIndex];
-                
-                int pointsEarned = 0; // Initialize points earned to 0
-                
-                // Call the appropriate method to record event for the specific goal type
+            
+
                 if (accomplishedGoal is SimpleGoal)
                 {
-                    pointsEarned = ((SimpleGoal)accomplishedGoal).RecordSimpleEvent();
+                    ((SimpleGoal)accomplishedGoal).RecordEvent();
                 }
                 else if (accomplishedGoal is EternalGoal)
                 {
-                    pointsEarned = ((EternalGoal)accomplishedGoal).RecordEternalEvent();
+                    ((EternalGoal)accomplishedGoal).RecordEvent();
                 }
                 else if (accomplishedGoal is CheckListGoal)
                 {
-                    pointsEarned = ((CheckListGoal)accomplishedGoal).RecordCheckListEvent();
+                    ((CheckListGoal)accomplishedGoal).RecordEvent();
                 }
                 
-                _score += pointsEarned; // Update _score with the earned points
+                _score += int.Parse(accomplishedGoal._points);
                 SaveGoals();
                 ListGoals(_goals);
-                Console.WriteLine($"You earned {pointsEarned} points.");
+                Console.WriteLine($"You earned {_score} points.");
             }
             else
             {
@@ -310,7 +308,25 @@ namespace prove
             }
         }
 
+        public List<Goal> goals DisplayPlayerInfo()
+        {
+            
+            List<Goal> displayScore = new List<Goal>();
 
+
+            foreach (var goal in goals)
+            {
+                
+                if (goal is SimpleGoal && ((SimpleGoal)goal)._isComplete == true)
+                {
+                    int.TryParse(goal._points, out _score); 
+                }
+
+            }
+            
+            return displayScore;
+
+        }
 
     }              
                
