@@ -23,11 +23,13 @@ namespace prove
             _goals = new List<Goal>();
             _score = 0;
 
+          
+
             int menu = 0;
         
             while (menu != 6)
                 {   
-                    
+                    DisplayPlayerInfo();
                   
                     Console.WriteLine("Menu Options: ");
                     Console.WriteLine("  1. Create New Goal");
@@ -51,8 +53,7 @@ namespace prove
                             SaveGoals();
                             break;
                         case 4:
-                            _goals = LoadGoals();
-                            ListGoals(_goals);
+                            LoadGoals();
                             break;
                         case 5:
                             RecordEvent();
@@ -161,29 +162,32 @@ namespace prove
         public void ListGoals(List<Goal> goals)
         {   
             Console.WriteLine("The goals are: ");
-            
+            Console.WriteLine($"{_score}");
 
-            foreach (var(goal, index) in goals.Select((goals, index) => (goals, index)))
+            foreach (var (goal, index) in goals.Select((goals, index) => (goals, index)))
             {
+                string status = "";
 
                 if (goal is SimpleGoal)
-                {   
+                {
                     SimpleGoal simpleGoal = (SimpleGoal)goal;
-                    Console.WriteLine($"{index + 1}. [] {goal._name} ({goal._description})");
+                    status = simpleGoal._isComplete ? "[x]" : "[ ]";
+                    Console.WriteLine($"{index + 1}. {status} {goal._name} ({goal._description})");
                 }
                 if (goal is EternalGoal)
-                {   
+                {
                     EternalGoal eternalGoal = (EternalGoal)goal;
-                    Console.WriteLine($"{index + 1}. [] {goal._name} ({goal._description})");
+                    // Eternal goals are never complete, so no need for an "x"
+                    status = "[ ]";
+                    Console.WriteLine($"{index + 1}. {status} {goal._name} ({goal._description})");
                 }
                 if (goal is CheckListGoal)
                 {
                     CheckListGoal checkListGoal = (CheckListGoal)goal;
-                    Console.WriteLine($"{index + 1}. [] {goal._name} ({goal._description}) -- Currently completed: {checkListGoal._amountCompleted}/{checkListGoal._target}");
+                    status = checkListGoal._amountCompleted >= checkListGoal._target ? "[x]" : "[ ]";
+                    Console.WriteLine($"{index + 1}. {status} {goal._name} ({goal._description}) -- Currently completed: {checkListGoal._amountCompleted}/{checkListGoal._target}");
                 }
-                
             }
-            
             
         }
 
@@ -282,25 +286,48 @@ namespace prove
             if (goalIndex >= 0 && goalIndex < _goals.Count)
             {
                 Goal accomplishedGoal = _goals[goalIndex];
-            
 
                 if (accomplishedGoal is SimpleGoal)
                 {
-                    ((SimpleGoal)accomplishedGoal).RecordEvent();
+                    SimpleGoal simpleGoal = (SimpleGoal)accomplishedGoal;
+                    if (!simpleGoal._isComplete)
+                    {
+                        simpleGoal.RecordEvent();
+                        _score += int.Parse(simpleGoal._points);
+                        SaveGoals();
+                        ListGoals(_goals);
+                        Console.WriteLine($"You earned {_score} points.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("This goal is already complete and cannot earn more points.");
+                    }
                 }
                 else if (accomplishedGoal is EternalGoal)
                 {
-                    ((EternalGoal)accomplishedGoal).RecordEvent();
+                    EternalGoal eternalGoal = (EternalGoal)accomplishedGoal;
+                    eternalGoal.RecordEvent();
+                    _score += int.Parse(eternalGoal._points);
+                    SaveGoals();
+                    ListGoals(_goals);
+                    Console.WriteLine($"You earned {_score} points.");
                 }
                 else if (accomplishedGoal is CheckListGoal)
                 {
-                    ((CheckListGoal)accomplishedGoal).RecordEvent();
+                    CheckListGoal checkListGoal = (CheckListGoal)accomplishedGoal;
+                    if (checkListGoal._amountCompleted < checkListGoal._target)
+                    {
+                        checkListGoal.RecordEvent();
+                        _score += int.Parse(checkListGoal._points);
+                        SaveGoals();
+                        ListGoals(_goals);
+                        Console.WriteLine($"You earned {_score} points.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("This goal has already reached its target and cannot earn more points.");
+                    }
                 }
-                
-                _score += int.Parse(accomplishedGoal._points);
-                SaveGoals();
-                ListGoals(_goals);
-                Console.WriteLine($"You earned {_score} points.");
             }
             else
             {
@@ -308,25 +335,32 @@ namespace prove
             }
         }
 
-        public List<Goal> goals DisplayPlayerInfo()
+
+        public void DisplayPlayerInfo()
         {
+            string directoryPath =  @"/home/moronibr/Library/Área de trabalho/Moroni/BYU/cse210-ww-student-template/prove/Develop05";
+
+            string[] txtFiles = Directory.GetFiles(directoryPath, "*.txt");
+
+            int totalScore = 0;
             
-            List<Goal> displayScore = new List<Goal>();
-
-
-            foreach (var goal in goals)
+            foreach (string file in txtFiles)
             {
-                
-                if (goal is SimpleGoal && ((SimpleGoal)goal)._isComplete == true)
+                using (StreamReader reader = new StreamReader(file))
                 {
-                    int.TryParse(goal._points, out _score); 
+                    string firstLine = reader.ReadLine();
+                    if (int.TryParse(firstLine, out int score))
+                    {
+                        totalScore += score;
+                    }
                 }
-
             }
-            
-            return displayScore;
 
+            Console.WriteLine($"You have {totalScore} points");
+            
         }
+
+      
 
     }              
                
